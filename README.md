@@ -2,7 +2,7 @@
 
 A Firefox add-on that automatically displays Goodreads rating, ratings count, reviews count, want-to-read count, and direct Goodreads/NetGalley book links above Notes on an individual Ingram iPage product page.
 
-**Status:** Version 1.0.1 is prepared for signing. No signed release is published yet. This source revision opens one Goodreads and one NetGalley background tab for each lookup and keeps them available for staff inspection; complete signed-in Firefox behavior and live Goodreads extraction remain unverified.
+**Status:** Version 1.0.1 was signed and published on October 3, 2026. Version 1.0.2 is now prepared for signing and publication; it contains the background-tab and Close GR/NG tabs changes described below.
 
 ## License
 
@@ -17,14 +17,14 @@ A Firefox add-on that automatically displays Goodreads rating, ratings count, re
 Permanent update address: `https://adelechase.github.io/ipage-quick-links/updates.json`.
 Keep the repository name and this address stable once signed copies are installed.
 
-## First signed release — no local software installation needed
+## Publishing version 1.0.2 — no local software installation needed
 
-1. In **Actions → Build unsigned add-on**, open the successful run and download **unsigned-addon-for-mozilla** from Artifacts. Extract that artifact download once. The ZIP inside, `ipage-quick-links-1.0.1-UNSIGNED.zip`, is the file for Mozilla. If no run exists, click **Run workflow**.
-2. At https://addons.mozilla.org/developers/ submit a new add-on, select **On your own**, and upload that inner ZIP. Complete signing. If asked about source: the extension is plain readable JavaScript with no compilation. See [reviewer notes](REVIEWER-NOTES.md).
-3. Download Mozilla's signed XPI. Install that exact file in Firefox and test it. Never edit/recompress a signed XPI.
-4. Rename the signed file to `ipage-quick-links-1.0.1.xpi` (renaming is okay). In GitHub **Releases → Draft a new release**, use tag `v1.0.1`, targeting the main commit used by the build. Attach that signed XPI and publish as a regular release, not a prerelease.
-5. In **Actions → Publish signed release → Run workflow**, enter `v1.0.1`. This downloads the attached XPI, checks it against the current source, creates its SHA-256 update entry, commits the feed, and deploys Pages. No Mozilla API credentials are needed.
-6. Check the website and update JSON. New users install from the signed download link; if Firefox downloads it instead, use **about:addons → gear → Install Add-on From File**. Remove a temporary copy first.
+1. In **Actions → Build unsigned add-on**, open the successful run for the 1.0.2 source commit and download **unsigned-addon-for-mozilla** from Artifacts. Extract that artifact download once. The ZIP inside, `ipage-quick-links-1.0.2-UNSIGNED.zip`, is the file for Mozilla.
+2. At https://addons.mozilla.org/developers/ upload that ZIP as a **new version of the existing add-on**. Keep the same add-on ID and complete signing. If asked about source: the extension is plain readable JavaScript with no compilation. See [reviewer notes](REVIEWER-NOTES.md).
+3. Download Mozilla's signed XPI. Install that exact file in Firefox and test it. Never edit or recompress a signed XPI.
+4. Rename the signed file to `ipage-quick-links-1.0.2.xpi` if needed. In GitHub **Releases → Draft a new release**, use tag `v1.0.2`, targeting the exact main commit used by the build. Attach that signed XPI and publish it as a regular release, not a prerelease.
+5. In **Actions → Publish signed release → Run workflow**, enter `v1.0.2`. This downloads the attached XPI, checks it against the current source, creates its SHA-256 update entry, commits the feed, and deploys Pages.
+6. Check the website and update JSON. Existing installations should then be able to receive 1.0.2 through Firefox's update mechanism.
 
 The release helper checks signature-file presence, not the cryptographic signature. Firefox performs signature verification. If a workflow is blocked by branch protection or GitHub Actions permission settings, review the failure before changing repository policy; there is no force push.
 
