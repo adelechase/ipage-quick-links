@@ -89,6 +89,9 @@
     return {blocked,book:book(doc,url,source),candidates:candidates(doc,url,source)};
   }
   const format=x=>x==null?'unavailable':Number(x).toLocaleString('en-US');
-  function line(gr) {return `GR: ${gr?.rating==null?'unavailable':gr.rating.toFixed(2)+'/5'}; ${format(gr?.ratings)}rat; ${format(gr?.reviews)}rev; ${format(gr?.want)}wtr; `;}
+  function line(gr) {
+    const rating=gr?.rating==null?'unavailable':`${gr.rating<3?'NR: ':''}${gr.rating.toFixed(2)}`;
+    return `${rating} GR; ${format(gr?.ratings)}rat; ${format(gr?.reviews)}rev; ${format(gr?.want)}wtr; `;
+  }
   globalThis.QuickBooks={clean,norm,titleKey,authorKey,count,canonical,identity,book,candidates,score,inspect,line};
 })();

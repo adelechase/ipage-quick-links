@@ -2,7 +2,7 @@
 
 A Firefox add-on that automatically displays Goodreads rating, ratings count, reviews count, want-to-read count, and direct Goodreads/NetGalley book links above Notes on an individual Ingram iPage product page.
 
-**Status:** Version 1.0.1 was signed and published on October 3, 2026. Version 1.0.2 was signed and published on October 3, 2026; its download page and automatic-update feed are live. It contains the background-tab and Close GR/NG tabs changes described below.
+**Status:** Version 1.0.1 was signed and published on October 3, 2026. Version 1.0.2 was signed and published on October 3, 2026; its download page and automatic-update feed are live. Version 1.0.3 is prepared for Mozilla signing and publication; it displays ratings as `4.67 GR`, with an `NR: ` prefix below 3.0 (for example `NR: 2.85 GR`).
 
 ## License
 
@@ -17,20 +17,20 @@ A Firefox add-on that automatically displays Goodreads rating, ratings count, re
 Permanent update address: `https://adelechase.github.io/ipage-quick-links/updates.json`.
 Keep the repository name and this address stable once signed copies are installed.
 
-## Publishing version 1.0.2 — no local software installation needed
+## Publishing version 1.0.3 — no local software installation needed
 
-1. In **Actions → Build unsigned add-on**, open the successful run for the 1.0.2 source commit and download **unsigned-addon-for-mozilla** from Artifacts. Extract that artifact download once. The ZIP inside, `ipage-quick-links-1.0.2-UNSIGNED.zip`, is the file for Mozilla.
+1. In **Actions → Build unsigned add-on**, open the successful run for the 1.0.3 source commit and download **unsigned-addon-for-mozilla** from Artifacts. Extract that artifact download once. The ZIP inside, `ipage-quick-links-1.0.3-UNSIGNED.zip`, is the file for Mozilla.
 2. At https://addons.mozilla.org/developers/ upload that ZIP as a **new version of the existing add-on**. Keep the same add-on ID and complete signing. If asked about source: the extension is plain readable JavaScript with no compilation. See [reviewer notes](REVIEWER-NOTES.md).
 3. Download Mozilla's signed XPI. Install that exact file in Firefox and test it. Never edit or recompress a signed XPI.
-4. Rename the signed file to `ipage-quick-links-1.0.2.xpi` if needed. In GitHub **Releases → Draft a new release**, use tag `v1.0.2`, targeting the exact main commit used by the build. Attach that signed XPI and publish it as a regular release, not a prerelease.
-5. In **Actions → Publish signed release → Run workflow**, enter `v1.0.2`. This downloads the attached XPI, checks it against the current source, creates its SHA-256 update entry, commits the feed, and deploys Pages.
-6. Check the website and update JSON. Existing installations should then be able to receive 1.0.2 through Firefox's update mechanism.
+4. Rename the signed file to `ipage-quick-links-1.0.3.xpi` if needed. In GitHub **Releases → Draft a new release**, use tag `v1.0.3`, targeting the exact main commit used by the build. Attach that signed XPI and publish it as a regular release, not a prerelease.
+5. In **Actions → Publish signed release → Run workflow**, enter `v1.0.3`. This downloads the attached XPI, checks it against the current source, creates its SHA-256 update entry, commits the feed, and deploys Pages.
+6. Check the website and update JSON. Existing installations should then be able to receive 1.0.3 through Firefox's update mechanism.
 
 The release helper checks signature-file presence, not the cryptographic signature. Firefox performs signature verification. If a workflow is blocked by branch protection or GitHub Actions permission settings, review the failure before changing repository policy; there is no force push.
 
 ## Later updates
 
-Edit code in `extension/`; increase the version in BOTH `extension/manifest.json` and `release-config.json` (for example 1.0.2); update CHANGELOG.md. Build, submit a new self-distributed version of the SAME Mozilla add-on, download and test the signed XPI, publish GitHub release v1.0.2 with asset ipage-quick-links-1.0.2.xpi, and run Publish signed release with that tag. Keep main's release source unchanged between the build and publication so validation can compare the signed bytes.
+Edit code in `extension/`; increase the version in BOTH `extension/manifest.json` and `release-config.json` (for example 1.0.3); update CHANGELOG.md. Build, submit a new self-distributed version of the SAME Mozilla add-on, download and test the signed XPI, publish GitHub release v1.0.3 with asset ipage-quick-links-1.0.3.xpi, and run Publish signed release with that tag. Keep main's release source unchanged between the build and publication so validation can compare the signed bytes.
 
 Never change the add-on ID: `ipage-quick-links@adele.local`. Each new version needs signing. Firefox checks the feed periodically; updates are not an immediate push. Test using an older signed installation and **Check for Updates** in Firefox. The first unsigned temporary build has no working update channel.
 

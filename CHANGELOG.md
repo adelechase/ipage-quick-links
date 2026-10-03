@@ -1,5 +1,9 @@
 # Release history
 
+## 1.0.3 — prepared October 3, 2026; pending signing and publication
+- Display the Goodreads rating first, for example **4.67 GR**, without the former colon or /5 suffix.
+- Prefix ratings below 3.0 with **NR: **, for example **NR: 2.85 GR**. Ratings of exactly 3.0 and unavailable ratings have no NR prefix.
+
 ## 1.0.2 — October 3, 2026; signed and published
 - Changed Goodreads and NetGalley source-page handling to use one normal background tab per site, reused throughout a lookup and left open for staff inspection.
 - Added a **Close GR/NG tabs** button above Notes to close the two extension-opened source tabs.

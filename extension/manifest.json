@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "iPage Quick GR and NG",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Automatically displays Goodreads counts and direct Goodreads/NetGalley book links above iPage Notes.",
   "permissions": [
     "storage"
