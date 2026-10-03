@@ -1,0 +1,20 @@
+name: Build unsigned add-on
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['extension/**', 'release.py', 'release-config.json', '.github/workflows/build.yml']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Prepare signing ZIP
+        run: python3 release.py prepare
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-addon-for-mozilla
+          path: build/*-UNSIGNED.zip
+          if-no-files-found: error

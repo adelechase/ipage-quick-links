@@ -1,0 +1,5 @@
+build/
+incoming/
+__pycache__/
+*.pyc
+*.xpi

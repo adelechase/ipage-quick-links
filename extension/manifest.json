@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "iPage Quick GR and NG \u2014 Firefox",
+  "version": "1.0.1",
+  "description": "Automatically displays Goodreads counts and direct Goodreads/NetGalley book links above iPage Notes.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://ipage.ingramcontent.com/*",
+    "https://www.goodreads.com/*",
+    "https://goodreads.com/*",
+    "https://www.netgalley.com/*",
+    "https://netgalley.com/*"
+  ],
+  "background": {
+    "scripts": [
+      "core.js",
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://ipage.ingramcontent.com/*"
+      ],
+      "js": [
+        "core.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.goodreads.com/*",
+        "https://goodreads.com/*",
+        "https://www.netgalley.com/*",
+        "https://netgalley.com/*"
+      ],
+      "js": [
+        "core.js",
+        "reader.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ipage-quick-links@adele.local",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": [
+          "websiteContent",
+          "searchTerms"
+        ]
+      },
+      "update_url": "https://adelechase.github.io/ipage-quick-links/updates.json"
+    }
+  }
+}
