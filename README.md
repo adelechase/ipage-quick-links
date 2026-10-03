@@ -2,7 +2,7 @@
 
 A Firefox add-on that automatically displays Goodreads rating, ratings count, reviews count, want-to-read count, and direct Goodreads/NetGalley book links above Notes on an individual Ingram iPage product page.
 
-**Status:** Version 1.0.1 was signed and published on October 3, 2026. Version 1.0.2 is now prepared for signing and publication; it contains the background-tab and Close GR/NG tabs changes described below.
+**Status:** Version 1.0.1 was signed and published on October 3, 2026. Version 1.0.2 was signed and published on October 3, 2026; its download page and automatic-update feed are live. It contains the background-tab and Close GR/NG tabs changes described below.
 
 ## License
 
@@ -12,7 +12,7 @@ A Firefox add-on that automatically displays Goodreads rating, ratings count, re
 
 1. For public downloads and remixing, make this repository public in **Settings → General → Danger Zone → Change repository visibility**. Only the extension and distribution files belong here; do not upload account credentials or private catalog exports.
 2. Open **Settings → Pages**. Set **Source: GitHub Actions**. This supersedes the earlier suggestion to select main /docs; the included workflows deploy that folder directly.
-3. Under **Actions**, run **Publish download page**. After it succeeds, check https://adelechase.github.io/ipage-quick-links/updates.json — it should initially contain an empty updates list.
+3. Under **Actions**, run **Publish download page**. After it succeeds, check https://adelechase.github.io/ipage-quick-links/updates.json — it now contains the signed 1.0.2 update. The download-page workflow also runs automatically when `docs/` or its workflow changes on main.
 
 Permanent update address: `https://adelechase.github.io/ipage-quick-links/updates.json`.
 Keep the repository name and this address stable once signed copies are installed.
@@ -34,7 +34,7 @@ Edit code in `extension/`; increase the version in BOTH `extension/manifest.json
 
 Never change the add-on ID: `ipage-quick-links@adele.local`. Each new version needs signing. Firefox checks the feed periodically; updates are not an immediate push. Test using an older signed installation and **Check for Updates** in Firefox. The first unsigned temporary build has no working update channel.
 
-If upload succeeded but deployment failed, rerun the workflow after fixing the reported setup issue. The feed remains empty until a signed release is processed. Do not replace an existing version's XPI with different bytes; publish a higher version.
+If upload succeeded but deployment failed, rerun the workflow after fixing the reported setup issue. The live feed changes only after a successful Pages deployment. Do not replace an existing version's XPI with different bytes; publish a higher version.
 
 ## Developer use
 

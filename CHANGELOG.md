@@ -1,6 +1,6 @@
 # Release history
 
-## 1.0.2 — prepared October 3, 2026; pending signing and publication
+## 1.0.2 — October 3, 2026; signed and published
 - Changed Goodreads and NetGalley source-page handling to use one normal background tab per site, reused throughout a lookup and left open for staff inspection.
 - Added a **Close GR/NG tabs** button above Notes to close the two extension-opened source tabs.
 
