@@ -2,7 +2,7 @@
 
 A Firefox add-on that automatically displays Goodreads rating, ratings count, reviews count, want-to-read count, and direct Goodreads/NetGalley book links above Notes on an individual Ingram iPage product page.
 
-**Status:** Version 1.0.1 is prepared for signing. No signed release is published yet. Lookup behavior is unchanged from 1.0.0; complete signed-in Firefox behavior and live Goodreads extraction remain unverified.
+**Status:** Version 1.0.1 is prepared for signing. No signed release is published yet. This source revision opens one Goodreads and one NetGalley background tab for each lookup and keeps them available for staff inspection; complete signed-in Firefox behavior and live Goodreads extraction remain unverified.
 
 ## License
 
@@ -40,7 +40,7 @@ If upload succeeded but deployment failed, rerun the workflow after fixing the r
 
 Load `extension/manifest.json` temporarily through Firefox's about:debugging. For a local signing ZIP run `python3 release.py prepare` (Python 3.9+, standard library only). For local feed preparation run `python3 release.py finalize /path/to/signed.xpi`; upload the signed asset to its GitHub Release separately before deploying docs/.
 
-The add-on targets the individual product page containing #pd-title and #add-to-sl-note-gb, not the multi-row cart list. Missing counts or uncertain matches show unavailable. It uses inactive source tabs when needed, and does not edit Notes. See [privacy information](docs/privacy.html).
+The add-on targets the individual product page containing #pd-title and #add-to-sl-note-gb, not the multi-row cart list. Missing counts or uncertain matches show unavailable. It opens one regular background tab for Goodreads and one for NetGalley, reuses those two tabs throughout the lookup, keeps them open for inspection, and adds a Close GR/NG tabs button above Notes. It does not edit Notes. See [privacy information](docs/privacy.html).
 
 ## References
 
