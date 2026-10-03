@@ -1,7 +1,18 @@
 {
   "addons": {
     "ipage-quick-links@adele.local": {
-      "updates": []
+      "updates": [
+        {
+          "version": "1.0.2",
+          "update_link": "https://github.com/adelechase/ipage-quick-links/releases/download/v1.0.2/ipage-quick-links-1.0.2.xpi",
+          "update_hash": "sha256:1ef9aa5b79666c7d3dbdb2b4e44032a0f9e4242942ec3d33c080ca5bf7499977",
+          "applications": {
+            "gecko": {
+              "strict_min_version": "142.0"
+            }
+          }
+        }
+      ]
     }
   }
 }
