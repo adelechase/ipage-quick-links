@@ -61,19 +61,21 @@
   }
   async function lookup(target,source,space) {
     const errors=[],seen=new Set();
-    // ISBN first. Title fallback covers editions and NetGalley format differences.
-    for(const query of [...new Set([target.isbn,target.title].filter(Boolean))]) {
+    // ISBN, exact title, then Goodreads-only regular-edition title + author.
+    for(const {query,regularEdition} of Q.lookupPlans(target,source)) {
+      const matchKey=title=>Q.titleKey(regularEdition?Q.editionTitle(title):title);
       const url=source==='gr'?`https://www.goodreads.com/search?q=${encodeURIComponent(query)}&search_type=books`:`https://www.netgalley.com/catalog/?text=${encodeURIComponent(query)}`;
       let page;
       try{page=await read(url,source,space);}catch(e){errors.push(e.message);if(/blocked|rate limit|verification/i.test(e.message))break;continue;}
-      if(page.book && Q.score(target,page.book))return {...page.book,status:'matched'};
-      const candidates=page.candidates.filter(c=>Q.titleKey(c.title)===Q.titleKey(target.title));
+      if(page.book && Q.score(target,page.book,regularEdition))return {...page.book,status:'matched'};
+      const candidates=page.candidates.filter(c=>matchKey(c.title)===matchKey(target.title));
       // Fetch candidate detail pages to verify the author/ISBN. Never return a search URL.
       const verified=[];
       for(const candidate of candidates.slice(0,4)) {
-        if(seen.has(candidate.url))continue;seen.add(candidate.url);
+        const candidateKey=regularEdition+':'+candidate.url;
+        if(seen.has(candidateKey))continue;seen.add(candidateKey);
         await pause(800);
-        try {const detail=(await read(candidate.url,source,space)).book,s=Q.score(target,detail);if(s)verified.push({...detail,score:s});}catch(e){errors.push(e.message);}
+        try {const detail=(await read(candidate.url,source,space)).book,s=Q.score(target,detail,regularEdition);if(s)verified.push({...detail,score:s});}catch(e){errors.push(e.message);}
       }
       if(verified.length) {
         verified.sort((a,b)=>b.score-a.score || (b.ratings??-1)-(a.ratings??-1) || a.url.localeCompare(b.url));
@@ -89,7 +91,7 @@
     }
   }
   async function research(book,refresh,space,owner) {
-    const key='quick-v1:'+JSON.stringify([book.isbn,Q.titleKey(book.title),Q.authorKey(book.author)]), inflightKey=owner+':'+key;
+    const key='quick-v2:'+JSON.stringify([book.isbn,Q.titleKey(book.title),Q.authorKey(book.author)]), inflightKey=owner+':'+key;
     if(inflight.has(inflightKey))return inflight.get(inflightKey);
     const work=(async()=>{
       if(!refresh){

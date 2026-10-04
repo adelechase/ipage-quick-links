@@ -1,6 +1,11 @@
 # Release history
 
-## 1.0.3 — prepared October 3, 2026; pending signing and publication
+## 1.0.4 — in development; not ready for signing
+- Added a Goodreads-only regular-edition fallback for explicit deluxe-edition labels, requiring matching title and author after ISBN and exact-title searches fail.
+- Invalidated the prior lookup cache so failed deluxe-edition matches are retried.
+- iPage Update/next-product integration is pending inspection of the native page controls.
+
+## 1.0.3 — signed and published
 - Display the Goodreads rating first, for example **4.67 GR**, without the former colon or /5 suffix.
 - Prefix ratings below 3.0 with **NR: **, for example **NR: 2.85 GR**. Ratings of exactly 3.0 and unavailable ratings have no NR prefix.
 
