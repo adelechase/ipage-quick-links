@@ -1,9 +1,10 @@
 # Release history
 
-## 1.0.4 — in development; not ready for signing
+## 1.0.4 — prepared October 4, 2026; pending signing and publication
 - Added a Goodreads-only regular-edition fallback for explicit deluxe-edition labels, requiring matching title and author after ISBN and exact-title searches fail.
 - Invalidated the prior lookup cache so failed deluxe-edition matches are retried.
-- iPage Update/next-product integration is pending inspection of the native page controls.
+- Clicking iPage's selection-list Update closes the current source tabs and supplies the next product as the native save's return destination, preserving iPage validation and the save payload. At the end of the list it keeps the normal destination.
+- Closing tabs cancels pending lookups so they cannot reopen source tabs; late messages from the previous product cannot close the next product's tabs.
 
 ## 1.0.3 — signed and published
 - Display the Goodreads rating first, for example **4.67 GR**, without the former colon or /5 suffix.
