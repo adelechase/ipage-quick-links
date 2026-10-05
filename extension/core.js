@@ -17,7 +17,15 @@
     if(source==='gr' && target.author && titleKey(title)!==titleKey(target.title)) {
       plans.push({query:clean(title+' '+target.author),regularEdition:true});
     }
+    const short=clean(title.split(':')[0]);
+    if(source==='gr' && target.author && title.includes(':') && short) {
+      plans.push({query:clean(short+' '+target.author),regularEdition:true,shortTitle:true});
+    }
     return plans;
+  }
+  function matchTitle(title,regularEdition=false,shortTitle=false) {
+    const value=regularEdition?editionTitle(title):title;
+    return titleKey(shortTitle?value.split(':')[0]:value);
   }
   const authorKey = x => {
     const s=clean(x).replace(/^by\s+/i,'').replace(/\s*\(Author\)\s*$/i,'');
@@ -93,10 +101,10 @@
     }
     return [...out.values()].slice(0,60);
   }
-  function score(target,found,regularEdition=false) {
+  function score(target,found,regularEdition=false,shortTitle=false) {
     if(!found || !found.title)return 0;
-    if(target.isbn && found.isbns?.includes(target.isbn))return 100;
-    const key=title=>titleKey(regularEdition?editionTitle(title):title);
+    if(!shortTitle && target.isbn && found.isbns?.includes(target.isbn))return 100;
+    const key=title=>matchTitle(title,regularEdition,shortTitle);
     if(!target.title || !target.author || key(target.title)!==key(found.title))return 0;
     return found.authors?.some(a=>authorKey(a)===authorKey(target.author))?80:0;
   }
@@ -110,5 +118,5 @@
     const rating=gr?.rating==null?'unavailable':`${gr.rating<3?'NR: ':''}${gr.rating.toFixed(2)}`;
     return `${rating} GR; ${format(gr?.ratings)}rat; ${format(gr?.reviews)}rev; ${format(gr?.want)}wtr; `;
   }
-  globalThis.QuickBooks={clean,norm,titleKey,editionTitle,lookupPlans,authorKey,count,canonical,identity,book,candidates,score,inspect,line};
+  globalThis.QuickBooks={clean,norm,titleKey,editionTitle,lookupPlans,matchTitle,authorKey,count,canonical,identity,book,candidates,score,inspect,line};
 })();

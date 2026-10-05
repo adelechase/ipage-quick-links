@@ -43,9 +43,10 @@
     const host=document.createElement('div');host.id='ipage-quick-links';
     const shadow=host.attachShadow({mode:'open'});
     const style=document.createElement('style');style.textContent=':host{display:block;margin:8px 0}section{font:13px/1.5 Arial,sans-serif;color:#222;background:#fff;border:1px solid #aaa;border-radius:4px;padding:8px;overflow-wrap:anywhere}a{color:#0645ad}button{margin-top:5px;font:11px Arial;cursor:pointer}button+button{margin-left:6px}';shadow.append(style);
-    const panel=document.createElement('section'),text=document.createElement('span'),retry=document.createElement('button'),close=document.createElement('button');
+    const panel=document.createElement('section'),text=document.createElement('span'),hint=document.createElement('small'),retry=document.createElement('button'),close=document.createElement('button');
+    hint.style.display='block';
     text.setAttribute('role','status');text.setAttribute('aria-live','polite');retry.textContent='Refresh';retry.type='button';close.textContent='Close GR/NG tabs';close.type='button';close.disabled=!hasTabs();
-    panel.append(text,document.createElement('br'),retry,close);shadow.append(panel);
+    panel.append(text,hint,document.createElement('br'),retry,close);shadow.append(panel);
     const label=notes.closest('td')?.querySelector('strong');
     const anchor=label && /^Notes\s*:?$/.test(label.textContent.trim())?label:notes;
     anchor.before(host);
@@ -53,7 +54,7 @@
     let loading=false;
     function link(url,source){const a=document.createElement('a');a.href=Q.canonical(url,source);a.textContent=a.href;a.target='_blank';a.rel='noopener noreferrer';text.append(a);}
     async function load(refresh=false) {
-      const id=++request;loading=true;retry.disabled=true;close.disabled=false;text.textContent='GR / NG: looking up this book…';
+      const id=++request;loading=true;retry.disabled=true;close.disabled=false;hint.textContent='';text.textContent='GR / NG: looking up this book…';
       try {
         const data=await browser.runtime.sendMessage({type:'quick-books-lookup',session,book,refresh,tabs:sourceTabs});
         if(id!==request || state!==current || !host.isConnected || JSON.stringify(Q.identity(document))!==key)return;
@@ -64,6 +65,7 @@
         if(Q.canonical(data.gr?.url,'gr'))link(data.gr.url,'gr');else text.append('GR link unavailable');
         text.append('; ');
         if(Q.canonical(data.ng?.url,'ng'))link(data.ng.url,'ng');else text.append('NG link unavailable');
+        hint.textContent=data.gr?.want==null?(data.gr?.wantStatus || ''):'';
         panel.title=`${book.title} — ${book.author}\nGR: ${data.gr.status}\nNG: ${data.ng.status}\nMissing counts are unavailable, not zero.`;
       } catch(e){if(id===request && state===current)text.textContent='GR / NG: unavailable — '+e.message;}
       finally{if(id===request){loading=false;retry.disabled=false;close.disabled=!hasTabs();}}

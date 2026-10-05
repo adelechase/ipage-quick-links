@@ -1,6 +1,13 @@
 # Release history
 
-## 1.0.4 — prepared October 4, 2026; pending signing and publication
+## 1.0.5 — prepared October 5, 2026; pending signing and publication
+- Recover missing Goodreads total want-to-read counts using a request without login cookies, then a temporary minimized private window when a rendered page is needed and Firefox private access is allowed. Only copy the count from the exact matched Goodreads book URL.
+- Close the temporary private tab on success, failure, timeout, Update, Close, or navigation to another product; retain the regular GR/NG tabs for inspection. Show private-access guidance when needed.
+- After ISBN, exact-title, and applicable deluxe-edition searches fail, try the title before the first colon plus the author on Goodreads. Verify both title and author. NetGalley matching is unchanged.
+- Invalidate older cached lookups and shorten caching for missing want-to-read counts so unavailable counts can be retried.
+- Add automated regressions for matching and count retrieval, and run tests before creating the signing ZIP.
+
+## 1.0.4 — October 4, 2026; signed and published
 - Added a Goodreads-only regular-edition fallback for explicit deluxe-edition labels, requiring matching title and author after ISBN and exact-title searches fail.
 - Invalidated the prior lookup cache so failed deluxe-edition matches are retried.
 - Clicking iPage's selection-list Update closes the current source tabs and supplies the next product as the native save's return destination, preserving iPage validation and the save payload. At the end of the list it keeps the normal destination.

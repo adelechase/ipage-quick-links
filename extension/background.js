@@ -5,14 +5,16 @@
   function searchUrl(target,source) {const query=target.isbn || target.title;return source==='gr'?`https://www.goodreads.com/search?q=${encodeURIComponent(query)}&search_type=books`:`https://www.netgalley.com/catalog/?text=${encodeURIComponent(query)}`;}
   function workspace(seed={}) {
     const tabs={gr:Number.isInteger(seed?.gr)?seed.gr:null,ng:Number.isInteger(seed?.ng)?seed.ng:null};
-    const controllers=new Set();let closed=false;
+    const controllers=new Set(),privateTabs=new Set();let closed=false;
     const guard=()=>{if(closed)throw Error('Lookup closed.');};
     return {
-      token:++serial,controllers,guard,isClosed:()=>closed,
+      token:++serial,controllers,privateTabs,guard,isClosed:()=>closed,
       ids:()=>({...tabs}),
       async close() {
         closed=true;for(const controller of controllers)controller.abort();
         const old={...tabs};tabs.gr=null;tabs.ng=null;
+        for(const id of privateTabs)await browser.tabs.remove(id).catch(()=>{});
+        privateTabs.clear();
         return closeTabs(old);
       },
       async show(url,source) {
@@ -78,22 +80,22 @@
   }
   async function lookup(target,source,space) {
     const errors=[],seen=new Set();
-    // ISBN, exact title, then Goodreads-only regular-edition title + author.
-    for(const {query,regularEdition} of Q.lookupPlans(target,source)) {
+    // ISBN, exact title, regular edition, then Goodreads title before ':' + author.
+    for(const {query,regularEdition,shortTitle=false} of Q.lookupPlans(target,source)) {
       space.guard();
-      const matchKey=title=>Q.titleKey(regularEdition?Q.editionTitle(title):title);
+      const matchKey=title=>Q.matchTitle(title,regularEdition,shortTitle);
       const url=source==='gr'?`https://www.goodreads.com/search?q=${encodeURIComponent(query)}&search_type=books`:`https://www.netgalley.com/catalog/?text=${encodeURIComponent(query)}`;
       let page;
       try{page=await read(url,source,space);space.guard();}catch(e){space.guard();errors.push(e.message);if(/blocked|rate limit|verification/i.test(e.message))break;continue;}
-      if(page.book && Q.score(target,page.book,regularEdition))return {...page.book,status:'matched'};
+      if(page.book && Q.score(target,page.book,regularEdition,shortTitle))return {...page.book,status:'matched'};
       const candidates=page.candidates.filter(c=>matchKey(c.title)===matchKey(target.title));
       // Fetch candidate detail pages to verify the author/ISBN. Never return a search URL.
       const verified=[];
       for(const candidate of candidates.slice(0,4)) {
-        const candidateKey=regularEdition+':'+candidate.url;
+        const candidateKey=regularEdition+':'+shortTitle+':'+candidate.url;
         if(seen.has(candidateKey))continue;seen.add(candidateKey);
         await pause(800);
-        try {const detail=(await read(candidate.url,source,space)).book,s=Q.score(target,detail,regularEdition);space.guard();if(s)verified.push({...detail,score:s});}catch(e){space.guard();errors.push(e.message);}
+        try {const detail=(await read(candidate.url,source,space)).book,s=Q.score(target,detail,regularEdition,shortTitle);space.guard();if(s)verified.push({...detail,score:s});}catch(e){space.guard();errors.push(e.message);}
       }
       if(verified.length) {
         verified.sort((a,b)=>b.score-a.score || (b.ratings??-1)-(a.ratings??-1) || a.url.localeCompare(b.url));
@@ -102,6 +104,68 @@
     }
     return {status:errors.length?errors.join(' '):'No reliable match found.',url:null};
   }
+  const exactCount=value=>Number.isSafeInteger(value) && value>=0;
+  function publicWant(snapshot,url) {
+    // Copy only the public count, and only from the exact matched Goodreads page.
+    const book=snapshot?.book;
+    return Q.canonical(book?.url,'gr')===url && exactCount(book?.want)?book.want:null;
+  }
+  async function anonymousWant(url,space) {
+    space.guard();
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+    space.controllers.add(controller);
+    try {
+      const response=await fetch(url,{credentials:'omit',cache:'no-store',signal:controller.signal});
+      space.guard();
+      if(response.status===403 || response.status===429)return {stop:true,status:'Goodreads restricted the logged-out count request; try again later.'};
+      if(!response.ok || Q.canonical(response.url,'gr')!==url)return {};
+      const html=await response.text();space.guard();
+      const snapshot=Q.inspect(new DOMParser().parseFromString(html,'text/html'),response.url,'gr');
+      if(snapshot.blocked)return {stop:true,status:'Goodreads requires verification; want-to-read count unavailable.'};
+      return {want:publicWant(snapshot,url)};
+    }catch{space.guard();return {};}
+    finally{clearTimeout(timer);space.controllers.delete(controller);}
+  }
+  async function privateWant(url,space) {
+    space.guard();
+    const permitted=await browser.extension.isAllowedIncognitoAccess();space.guard();
+    if(!permitted)return {status:'For the missing want-to-read count, enable Run in Private Windows for this extension, then Refresh.'};
+    let tab;
+    try {
+      // Firefox cannot hide an active/only tab. Use a minimized private window;
+      // do not reuse or alter any private windows the user already has open.
+      const win=await browser.windows.create({url,incognito:true,focused:false,state:'minimized'});
+      tab=win.tabs?.[0];
+      if(Number.isInteger(tab?.id))space.privateTabs.add(tab.id);
+      space.guard();
+      if(!Number.isInteger(tab?.id) || !win.incognito)throw Error('Private window unavailable.');
+      for(let i=0;i<20;i++) {
+        await pause(1000);space.guard();
+        let snapshot;
+        try{snapshot=await browser.tabs.sendMessage(tab.id,{type:'quick-books-snapshot'});}catch{continue;}
+        space.guard();
+        if(snapshot?.blocked)return {status:'Goodreads requires verification; want-to-read count unavailable.'};
+        const want=publicWant(snapshot,url);
+        if(want!==null)return {want};
+      }
+      return {status:'Goodreads did not expose a total want-to-read count in the private page.'};
+    }finally {
+      // Removing our tab closes the window if it is still its only tab. Never
+      // remove the entire window: the user may have added another tab to it.
+      if(Number.isInteger(tab?.id)){space.privateTabs.delete(tab.id);await browser.tabs.remove(tab.id).catch(()=>{});}
+    }
+  }
+  async function fillWant(gr,space) {
+    const url=Q.canonical(gr?.url,'gr');
+    if(!url || exactCount(gr.want))return gr;
+    const anonymous=await anonymousWant(url,space);
+    if(exactCount(anonymous.want))return {...gr,want:anonymous.want};
+    if(anonymous.stop)return {...gr,wantStatus:anonymous.status};
+    try {
+      const result=await privateWant(url,space);
+      return exactCount(result.want)?{...gr,want:result.want}:{...gr,wantStatus:result.status};
+    }catch{space.guard();return {...gr,wantStatus:'The private Goodreads count lookup could not finish. Try Refresh.'};}
+  }
   async function reveal(book,result,space) {
     for(const source of ['gr','ng']) {
       const url=Q.canonical(result?.[source]?.url,source) || searchUrl(book,source);
@@ -109,7 +173,7 @@
     }
   }
   async function research(book,refresh,space) {
-    const key='quick-v2:'+JSON.stringify([book.isbn,Q.titleKey(book.title),Q.authorKey(book.author)]), inflightKey=space.token+':'+key;
+    const key='quick-v3:'+JSON.stringify([book.isbn,Q.titleKey(book.title),Q.authorKey(book.author)]), inflightKey=space.token+':'+key;
     if(inflight.has(inflightKey))return inflight.get(inflightKey);
     const work=(async()=>{
       if(!refresh){
@@ -119,9 +183,9 @@
       }
       const run=async()=>{
         space.guard();
-        const gr=await lookup(book,'gr',space), ng=await lookup(book,'ng',space);
+        const gr=await fillWant(await lookup(book,'gr',space),space), ng=await lookup(book,'ng',space);
         space.guard();
-        const result={gr,ng,at:Date.now(),ttl:gr.url && ng.url?6*60*60*1000:5*60*1000};
+        const result={gr,ng,at:Date.now(),ttl:gr.url && ng.url && exactCount(gr.want)?6*60*60*1000:5*60*1000};
         await browser.storage.local.set({[key]:result});return result;
       };
       const task=queue.then(run,run);queue=task.catch(()=>{});

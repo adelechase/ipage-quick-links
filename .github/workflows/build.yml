@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['extension/**', 'release.py', 'release-config.json', '.github/workflows/build.yml']
+    paths: ['extension/**', 'tests/**', 'release.py', 'release-config.json', '.github/workflows/build.yml']
 permissions:
   contents: read
 jobs:
@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Test lookup and tab handling
+        run: node --test tests/*.test.cjs
       - name: Prepare signing ZIP
         run: python3 release.py prepare
       - uses: actions/upload-artifact@v4
