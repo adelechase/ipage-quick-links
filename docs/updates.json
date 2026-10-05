@@ -31,6 +31,16 @@
               "strict_min_version": "142.0"
             }
           }
+        },
+        {
+          "version": "1.0.5",
+          "update_link": "https://github.com/adelechase/ipage-quick-links/releases/download/v1.0.5/ipage-quick-links-1.0.5.xpi",
+          "update_hash": "sha256:067c27113ef3949c06626303c4abbf0a1bace94f2befc3bd6d84836d409f6d5f",
+          "applications": {
+            "gecko": {
+              "strict_min_version": "142.0"
+            }
+          }
         }
       ]
     }
