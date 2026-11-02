@@ -65,8 +65,8 @@
         if(Q.canonical(data.gr?.url,'gr'))link(data.gr.url,'gr');else text.append('GR link unavailable');
         text.append('; ');
         if(Q.canonical(data.ng?.url,'ng'))link(data.ng.url,'ng');else text.append('NG link unavailable');
-        hint.textContent=data.gr?.want==null?(data.gr?.wantStatus || ''):'';
-        panel.title=`${book.title} — ${book.author}\nGR: ${data.gr.status}\nNG: ${data.ng.status}\nMissing counts are unavailable, not zero.`;
+        hint.textContent=data.gr?.want==null && data.gr?.wantStatus!=='Goodreads did not expose a total want-to-read count in the private page.'?(data.gr?.wantStatus || ''):'';
+        panel.title=`${book.title} — ${book.author}\nGR: ${data.gr.status}\nNG: ${data.ng.status}\nMissing ratings and review counts are unavailable. An unavailable want-to-read count displays as 0wtr.`;
       } catch(e){if(id===request && state===current)text.textContent='GR / NG: unavailable — '+e.message;}
       finally{if(id===request){loading=false;retry.disabled=false;close.disabled=!hasTabs();}}
     }

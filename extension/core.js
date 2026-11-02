@@ -116,7 +116,8 @@
   const format=x=>x==null?'unavailable':Number(x).toLocaleString('en-US');
   function line(gr) {
     const rating=gr?.rating==null?'unavailable':`${gr.rating<3?'NR: ':''}${gr.rating.toFixed(2)}`;
-    return `${rating} GR; ${format(gr?.ratings)}rat; ${format(gr?.reviews)}rev; ${format(gr?.want)}wtr; `;
+    const want=gr?.want==null && canonical(gr?.url,'gr')?0:gr?.want;
+    return `${rating} GR; ${format(gr?.ratings)}rat; ${format(gr?.reviews)}rev; ${format(want)}wtr; `;
   }
   globalThis.QuickBooks={clean,norm,titleKey,editionTitle,lookupPlans,matchTitle,authorKey,count,canonical,identity,book,candidates,score,inspect,line};
 })();
