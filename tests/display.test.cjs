@@ -19,8 +19,12 @@ test('real Goodreads want-to-read totals including zero are displayed unchanged'
   assert.match(line({url:goodreads,rating:4.2,want:12345}),/12,345wtr/);
 });
 
-test('books without a Goodreads match are not treated as having zero want-to-reads',()=>{
-  assert.match(line({url:null,status:'No reliable match found.',want:null}),/unavailablewtr/);
+test('books without a Goodreads match display em dashes instead of unavailable',()=>{
+  assert.equal(line({url:null,status:'No reliable match found.',want:null}),'— GR; —rat; —rev; —wtr; ');
+});
+
+test('missing rating and review counts display em dashes for matched books',()=>{
+  assert.equal(line({url:goodreads,rating:null,ratings:null,reviews:null,want:42}),'— GR; —rat; —rev; 42wtr; ');
 });
 
 test('the unavailable-private-page explanation is suppressed in the display',()=>{

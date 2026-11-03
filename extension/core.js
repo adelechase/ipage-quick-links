@@ -113,9 +113,9 @@
     const blocked=/just a moment|access denied|robot check|verify you are human|captcha/i.test(title) || !!doc.querySelector('#challenge-form, #captcha, form[action*="captcha"]');
     return {blocked,book:book(doc,url,source),candidates:candidates(doc,url,source)};
   }
-  const format=x=>x==null?'unavailable':Number(x).toLocaleString('en-US');
+  const format=x=>x==null?'—':Number(x).toLocaleString('en-US');
   function line(gr) {
-    const rating=gr?.rating==null?'unavailable':`${gr.rating<3?'NR: ':''}${gr.rating.toFixed(2)}`;
+    const rating=gr?.rating==null?'—':`${gr.rating<3?'NR: ':''}${gr.rating.toFixed(2)}`;
     const want=gr?.want==null && canonical(gr?.url,'gr')?0:gr?.want;
     return `${rating} GR; ${format(gr?.ratings)}rat; ${format(gr?.reviews)}rev; ${format(want)}wtr; `;
   }
