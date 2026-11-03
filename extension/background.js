@@ -80,22 +80,22 @@
   }
   async function lookup(target,source,space) {
     const errors=[],seen=new Set();
-    // ISBN, exact title, regular edition, then Goodreads title before ':' + author.
-    for(const {query,regularEdition,shortTitle=false} of Q.lookupPlans(target,source)) {
+    // ISBN, exact title, deluxe edition, subtitle, then terminal-parentheses fallback.
+    for(const {query,regularEdition,shortTitle=false,ignoreTrailingParentheses=false} of Q.lookupPlans(target,source)) {
       space.guard();
-      const matchKey=title=>Q.matchTitle(title,regularEdition,shortTitle);
+      const matchKey=title=>Q.matchTitle(title,regularEdition,shortTitle,ignoreTrailingParentheses);
       const url=source==='gr'?`https://www.goodreads.com/search?q=${encodeURIComponent(query)}&search_type=books`:`https://www.netgalley.com/catalog/?text=${encodeURIComponent(query)}`;
       let page;
       try{page=await read(url,source,space);space.guard();}catch(e){space.guard();errors.push(e.message);if(/blocked|rate limit|verification/i.test(e.message))break;continue;}
-      if(page.book && Q.score(target,page.book,regularEdition,shortTitle))return {...page.book,status:'matched'};
+      if(page.book && Q.score(target,page.book,regularEdition,shortTitle,ignoreTrailingParentheses))return {...page.book,status:'matched'};
       const candidates=page.candidates.filter(c=>matchKey(c.title)===matchKey(target.title));
       // Fetch candidate detail pages to verify the author/ISBN. Never return a search URL.
       const verified=[];
       for(const candidate of candidates.slice(0,4)) {
-        const candidateKey=regularEdition+':'+shortTitle+':'+candidate.url;
+        const candidateKey=regularEdition+':'+shortTitle+':'+ignoreTrailingParentheses+':'+candidate.url;
         if(seen.has(candidateKey))continue;seen.add(candidateKey);
         await pause(800);
-        try {const detail=(await read(candidate.url,source,space)).book,s=Q.score(target,detail,regularEdition,shortTitle);space.guard();if(s)verified.push({...detail,score:s});}catch(e){space.guard();errors.push(e.message);}
+        try {const detail=(await read(candidate.url,source,space)).book,s=Q.score(target,detail,regularEdition,shortTitle,ignoreTrailingParentheses);space.guard();if(s)verified.push({...detail,score:s});}catch(e){space.guard();errors.push(e.message);}
       }
       if(verified.length) {
         verified.sort((a,b)=>b.score-a.score || (b.ratings??-1)-(a.ratings??-1) || a.url.localeCompare(b.url));

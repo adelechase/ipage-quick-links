@@ -1,8 +1,8 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
 const root=path.join(__dirname,'../extension'),grUrl='https://www.goodreads.com/book/show/101',ngUrl='https://www.netgalley.com/catalog/book/202';
 const book={title:'Dangerous Ground',author:'Alice Henderson',isbn:''};
-const detail=(source,want=null)=>({title:book.title,authors:[book.author],isbns:[],rating:4.1,ratings:200,reviews:30,want,url:source==='gr'?grUrl:ngUrl});
-const snapshot=(source,want=null)=>({blocked:false,book:detail(source,want),candidates:[]});
+const detail=(source,want=null,title=book.title,author=book.author)=>({title,authors:[author],isbns:[],rating:4.1,ratings:200,reviews:30,want,url:source==='gr'?grUrl:ngUrl});
+const snapshot=(source,want=null,title=book.title,author=book.author)=>({blocked:false,book:detail(source,want,title,author),candidates:[]});
 async function until(fn){for(let i=0;i<200;i++){if(fn())return;await new Promise(r=>setTimeout(r,1));}assert.ok(fn(),'expected async operation started');}
 function harness(options={}) {
  let listener,next=10,releasePrivate,anonymousStarted=false,aborted=false;
@@ -16,7 +16,8 @@ function harness(options={}) {
  }},tabs:{create:async data=>{const t={id:++next,...data};tabs.set(t.id,t);return t;},update:async(id,data)=>{if(!tabs.has(id))throw Error('Missing tab');return Object.assign(tabs.get(id),data);},remove:async id=>{removed.push(id);tabs.delete(id);},onRemoved:{addListener:()=>{}},sendMessage:async id=>{
   const t=tabs.get(id);if(!t)throw Error('Missing tab');
   if(t.incognito){if(options.privateError)throw Error('No reader');const s=snapshot('gr',options.privateWant??4321);if(options.wrongPrivate)s.book.url='https://www.goodreads.com/book/show/999';if(options.privateBlocked)s.blocked=true;return s;}
-  return snapshot(t.url.includes('goodreads')?'gr':'ng',signedWant);
+  const source=t.url.includes('goodreads')?'gr':'ng';
+  return snapshot(source,signedWant,source==='gr'?(options.goodreadsTitle??book.title):book.title,source==='gr'?(options.goodreadsAuthor??book.author):book.author);
  }}};
  const ctx=vm.createContext({URL,AbortController,browser,setTimeout:(f,ms)=>setTimeout(f,[800,1000].includes(ms)?0:ms),clearTimeout,DOMParser:class{parseFromString(s){return JSON.parse(s);}}});
  ctx.fetch=async(url,init)=>{
@@ -25,8 +26,8 @@ function harness(options={}) {
    anonymousStarted=true;
    if(options.holdAnonymous)await new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>{aborted=true;reject(Error('Cancelled'));},{once:true}));
    data=snapshot('gr',options.anonymousWant??null);if(options.wrongAnonymous)data.book.url='https://www.goodreads.com/book/show/999';if(options.anonymousBlocked)data.blocked=true;
-  }else if(!url.includes('/book/'))data={book:null,candidates:[{title:book.title,url:source==='gr'?grUrl:ngUrl}]};
-  else data=snapshot(source,signedWant);
+  }else if(!url.includes('/book/'))data={book:null,candidates:[{title:source==='gr'?(options.searchCandidateTitle??options.goodreadsTitle??book.title):book.title,url:source==='gr'?grUrl:ngUrl}]};
+  else data=snapshot(source,signedWant,source==='gr'?(options.goodreadsTitle??book.title):book.title,source==='gr'?(options.goodreadsAuthor??book.author):book.author);
   const status=init.credentials==='omit'?(options.status??200):200;
   return {ok:status===200,status,url,text:async()=>JSON.stringify(data)};
  };
@@ -67,4 +68,27 @@ test('Update aborts the anonymous request and does not open a private window',as
 });
 test('full lookup reaches title-before-colon fallback and verifies author on the detail page',async()=>{
  const h=harness({signedWant:123});const r=await h.lookup({...book,title:'Dangerous Ground: A Novel of Suspense (Alex Carter #6)'});assert.equal(r.gr.url,grUrl);assert.ok(h.requests.some(r=>new URL(r.url).searchParams.get('q')==='Dangerous Ground Alice Henderson'));assert.equal(r.ng.url,null);
+});
+
+test('full Goodreads lookup retries after removing trailing parentheses from both titles',async()=>{
+ const h=harness({signedWant:123,goodreadsTitle:'The Glass Sea (Commemorative Edition)',goodreadsAuthor:'Nadia Reid'});
+ const result=await h.lookup({title:'The Glass Sea (Special Printing)',author:'Nadia Reid',isbn:''});
+ assert.equal(result.gr.url,grUrl);
+ assert.equal(result.gr.title,'The Glass Sea (Commemorative Edition)');
+ assert.ok(h.requests.some(r=>new URL(r.url).searchParams.get('q')==='The Glass Sea Nadia Reid'));
+ assert.equal(result.ng.url,null);
+});
+
+test('trailing-parentheses retry matches when only Goodreads has the suffix',async()=>{
+ const h=harness({signedWant:0,goodreadsTitle:'The Glass Sea (Commemorative Edition)',goodreadsAuthor:'Nadia Reid'});
+ const result=await h.lookup({title:'The Glass Sea',author:'Nadia Reid',isbn:''});
+ assert.equal(result.gr.url,grUrl);
+ assert.ok(h.requests.some(r=>new URL(r.url).searchParams.get('q')==='The Glass Sea Nadia Reid'));
+});
+
+test('trailing-parentheses retry does not accept a Goodreads book by a different author',async()=>{
+ const h=harness({signedWant:0,goodreadsTitle:'The Glass Sea (Commemorative Edition)',goodreadsAuthor:'Someone Else'});
+ const result=await h.lookup({title:'The Glass Sea (Special Printing)',author:'Nadia Reid',isbn:''});
+ assert.equal(result.gr.url,null);
+ assert.equal(result.gr.status,'No reliable match found.');
 });

@@ -11,6 +11,23 @@
     value=value.replace(new RegExp(String.raw`(?:\s*[:–—-]\s*|\s+)${suffix}\s*$`,'i'),'');
     return clean(value) || clean(title);
   }
+  function stripTrailingParentheticals(title) {
+    // Remove all terminal parenthetical groups, including nested groups,
+    // but preserve parenthetical text within a title.
+    let value=clean(title);
+    while(value.endsWith(')')) {
+      let depth=0,start=-1;
+      for(let i=value.length-1;i>=0;i--) {
+        if(value[i]===')')depth++;
+        else if(value[i]==='(' && --depth===0){start=i;break;}
+      }
+      if(start<0)break;
+      const base=clean(value.slice(0,start));
+      if(!base)break; // Never turn an entire parenthesized title into an empty title.
+      value=base;
+    }
+    return value;
+  }
   function lookupPlans(target,source) {
     const plans=[...new Set([target.isbn,target.title].filter(Boolean))].map(query=>({query,regularEdition:false}));
     const title=editionTitle(target.title);
@@ -21,10 +38,18 @@
     if(source==='gr' && target.author && title.includes(':') && short) {
       plans.push({query:clean(short+' '+target.author),regularEdition:true,shortTitle:true});
     }
+    // Final Goodreads fallback: retry the title + author with terminal
+    // parenthetical groups removed, and compare both titles the same way.
+    // Also helps when only the Goodreads title has a parenthetical suffix.
+    if(source==='gr' && target.author) {
+      const withoutSuffix=stripTrailingParentheticals(title);
+      if(withoutSuffix)plans.push({query:clean(withoutSuffix+' '+target.author),regularEdition:true,ignoreTrailingParentheses:true});
+    }
     return plans;
   }
-  function matchTitle(title,regularEdition=false,shortTitle=false) {
-    const value=regularEdition?editionTitle(title):title;
+  function matchTitle(title,regularEdition=false,shortTitle=false,ignoreTrailingParentheses=false) {
+    const edition=regularEdition?editionTitle(title):title;
+    const value=ignoreTrailingParentheses?stripTrailingParentheticals(edition):edition;
     return titleKey(shortTitle?value.split(':')[0]:value);
   }
   const authorKey = x => {
@@ -101,10 +126,10 @@
     }
     return [...out.values()].slice(0,60);
   }
-  function score(target,found,regularEdition=false,shortTitle=false) {
+  function score(target,found,regularEdition=false,shortTitle=false,ignoreTrailingParentheses=false) {
     if(!found || !found.title)return 0;
     if(!shortTitle && target.isbn && found.isbns?.includes(target.isbn))return 100;
-    const key=title=>matchTitle(title,regularEdition,shortTitle);
+    const key=title=>matchTitle(title,regularEdition,shortTitle,ignoreTrailingParentheses);
     if(!target.title || !target.author || key(target.title)!==key(found.title))return 0;
     return found.authors?.some(a=>authorKey(a)===authorKey(target.author))?80:0;
   }
@@ -119,5 +144,5 @@
     const want=gr?.want==null && canonical(gr?.url,'gr')?0:gr?.want;
     return `${rating} GR; ${format(gr?.ratings)}rat; ${format(gr?.reviews)}rev; ${format(want)}wtr; `;
   }
-  globalThis.QuickBooks={clean,norm,titleKey,editionTitle,lookupPlans,matchTitle,authorKey,count,canonical,identity,book,candidates,score,inspect,line};
+  globalThis.QuickBooks={clean,norm,titleKey,editionTitle,stripTrailingParentheticals,lookupPlans,matchTitle,authorKey,count,canonical,identity,book,candidates,score,inspect,line};
 })();
