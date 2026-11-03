@@ -104,10 +104,19 @@ def finalize(signed_file):
              'applications': {'gecko': {'strict_min_version': expected['browser_specific_settings']['gecko']['strict_min_version']}}}
     updates[:] = [e for e in updates if e['version'] != version] + [entry]
     write_json(index, feed)
+    fallback_version = json.loads((ROOT / 'release-config.json').read_text(encoding='utf-8')).get('fallback_version')
+    if fallback_version is not None and (not isinstance(fallback_version, str)
+       or not re.fullmatch(r'\d+\.\d+\.\d+', fallback_version)
+       or tuple(map(int, fallback_version.split('.'))) >= current_number):
+        raise ValueError('fallback_version must be a numeric version older than this release.')
+    fallback_html = ''
+    if fallback_version:
+        fallback_url = asset_base.replace('v' + version + '/', 'v' + fallback_version + '/') + f'ipage-quick-links-{fallback_version}.xpi'
+        fallback_html = f'<p>Fallback: <a href="{html.escape(fallback_url, quote=True)}">signed version {html.escape(fallback_version)}</a></p>'
     (publish / 'index.html').write_text(
         '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">'
         '<title>iPage Quick GR and NG</title><body><h1>iPage Quick GR and NG</h1>'
-        f'<p><a href="{html.escape(asset_base + filename, quote=True)}">Install version {html.escape(version)} for Firefox</a></p>'
+        f'<p><a href="{html.escape(asset_base + filename, quote=True)}">Install version {html.escape(version)} for Firefox</a></p>' + fallback_html +
         '<p>Firefox 142 or newer. If downloaded instead of installed, open about:addons, use the gear menu, '
         'and choose Install Add-on From File.</p><p><a href="privacy.html">Privacy information</a></p></body></html>\n', encoding='utf-8')
     print(f'Prepared signed release and update feed in {publish}')

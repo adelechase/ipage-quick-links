@@ -1,5 +1,6 @@
 {
   "base_url": "https://adelechase.github.io/ipage-quick-links/",
-  "version": "1.0.5",
-  "release_base_url": "https://github.com/adelechase/ipage-quick-links/releases/download/v{version}/"
+  "version": "1.0.6",
+  "release_base_url": "https://github.com/adelechase/ipage-quick-links/releases/download/v{version}/",
+  "fallback_version": "1.0.5"
 }
