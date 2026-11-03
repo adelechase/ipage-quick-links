@@ -42,7 +42,7 @@ test('symmetric fallback compares both books without trailing parentheses but st
  assert.equal(Q.score(t,{...b,title:'The Glass Seas (Anniversary Edition)'},true,false,true),0);
  assert.equal(Q.score(t,{...b,authors:['Another Author']},true,false,true),0);
  assert.equal(Q.score({...t,title:'The Glass Sea'},b,true,false,true),80);
- assert.equal(Q.score({...t,title:'The (Glass) Sea'},b,true,false,true),0);
+ assert.equal(Q.score({...t,title:'The (Hidden) Glass Sea'},b,true,false,true),0);
 });
 
 test('parenthetical fallback is last and never changes NetGalley plans',()=>{
