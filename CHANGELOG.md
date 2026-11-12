@@ -1,12 +1,15 @@
 # Release history
 
-## 1.0.6 — November 3, 2026; prepared for Mozilla signing
+## 1.0.7 — prepared for Mozilla signing
+- Add the blue iPage icon for Firefox’s add-on interface.
+
+## 1.0.6 — signed and published (fallback version)
 - Display `0wtr` when a matched Goodreads book lacks an accessible want-to-read total; suppress the private-page missing-count message while retaining the missing count internally for retries.
 - Display an em dash (—) instead of "unavailable" in Goodreads statistics when no value is available, except for the 0wtr case above.
 - Add a last-resort Goodreads-only matching attempt that strips terminal parenthetical phrases from both Ingram and Goodreads titles, then verifies the title and author; existing ISBN, deluxe-edition, subtitle, and NetGalley behavior is preserved.
 - Add display and matching regression tests. Retain signed v1.0.5 as the fallback.
 
-## 1.0.5 — October 5, 2026; signed and published (fallback version)
+## 1.0.5 — October 5, 2026; signed and published
 - Recover missing Goodreads total want-to-read counts using a request without login cookies, then a temporary minimized private window when a rendered page is needed and Firefox private access is allowed. Only copy the count from the exact matched Goodreads book URL.
 - Close the temporary private tab on success, failure, timeout, Update, Close, or navigation to another product; retain the regular GR/NG tabs for inspection. Show private-access guidance when needed.
 - After ISBN, exact-title, and applicable deluxe-edition searches fail, try the title before the first colon plus the author on Goodreads. Verify both title and author. NetGalley matching is unchanged.

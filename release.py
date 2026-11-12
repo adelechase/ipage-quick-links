@@ -51,7 +51,7 @@ def prepare():
     build.mkdir(exist_ok=True)
     destination = build / f'ipage-quick-links-{version}-UNSIGNED.zip'
     with ZipFile(destination, 'w', ZIP_DEFLATED) as z:
-        for name in FILES:
+        for name in (*FILES, *m.get('icons', {}).values()):
             z.write(ROOT / 'extension' / name, name)
     print(f'Upload to Mozilla for self-distribution signing: {destination}')
     print('This ZIP is unsigned. Download Mozilla\'s signed XPI, then run finalize.')
@@ -70,7 +70,7 @@ def finalize(signed_file):
         actual = json.loads(z.read('manifest.json'))
         if actual != expected:
             raise ValueError('Signed manifest differs from the prepared release; check version, ID, URL, and permissions.')
-        for name in FILES[1:]:
+        for name in (*FILES[1:], *expected.get('icons', {}).values()):
             if z.read(name) != (ROOT / 'extension' / name).read_bytes():
                 raise ValueError(f'Signed {name} differs from the prepared source. Sign the current build.')
         lower = {name.lower() for name in names}

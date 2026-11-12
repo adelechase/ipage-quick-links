@@ -2,7 +2,7 @@
 
 A Firefox add-on that automatically displays Goodreads rating, ratings count, reviews count, want-to-read count, and direct Goodreads/NetGalley book links above Notes on an individual Ingram iPage product page.
 
-**Status:** v1.0.5 is signed, published, and retained as the **fallback** ([signed XPI](https://github.com/adelechase/ipage-quick-links/releases/download/v1.0.5/ipage-quick-links-1.0.5.xpi)). v1.0.6 is being prepared for Mozilla signing and is not yet a signed release.
+**Status:** v1.0.6 is signed, published, and retained as the **fallback** ([signed XPI](https://github.com/adelechase/ipage-quick-links/releases/download/v1.0.6/ipage-quick-links-1.0.6.xpi)). v1.0.7 is being prepared for Mozilla signing and is not yet a signed release.
 
 ## License
 
@@ -18,16 +18,16 @@ SPDX identifier: `PolyForm-Noncommercial-1.0.0`
 Permanent update address: `https://adelechase.github.io/ipage-quick-links/updates.json`.
 Keep the repository name and this address stable once signed copies are installed.
 
-## Publish v1.0.6
+## Publish v1.0.7
 
-The previous signed **v1.0.5** remains the fallback release. Its [signed XPI](https://github.com/adelechase/ipage-quick-links/releases/download/v1.0.5/ipage-quick-links-1.0.5.xpi) and `v1.0.5` tag are preserved. Do not change the live update feed to v1.0.6 until Mozilla signs that version.
+The previous signed **v1.0.6** remains the fallback release. Its [signed XPI](https://github.com/adelechase/ipage-quick-links/releases/download/v1.0.6/ipage-quick-links-1.0.6.xpi) and `v1.0.6` tag are preserved. Do not change the live update feed to v1.0.7 until Mozilla signs that version.
 
-1. In GitHub **Actions → Build unsigned add-on**, open the successful run for the v1.0.6 source commit. Download **unsigned-addon-for-mozilla** under Artifacts and extract the downloaded artifact once. Inside is `ipage-quick-links-1.0.6-UNSIGNED.zip`; submit this **inner** ZIP to Mozilla.
+1. In GitHub **Actions → Build unsigned add-on**, open the successful run for the v1.0.7 source commit. Download **unsigned-addon-for-mozilla** under Artifacts and extract the downloaded artifact once. Inside is `ipage-quick-links-1.0.7-UNSIGNED.zip`; submit this **inner** ZIP to Mozilla.
 2. Sign in at [Mozilla Add-ons Developer Hub](https://addons.mozilla.org/developers/). Select the existing, self-distributed/unlisted **iPage Quick GR and NG** add-on. Choose **Upload New Version** (label may vary). Do not submit a new add-on. Upload the unsigned ZIP and follow the prompts. The scripts are readable JavaScript, with no build tools or generated source; refer to [reviewer notes](REVIEWER-NOTES.md) if asked.
 3. After Mozilla signs it, download the signed `.xpi` from the new version page and test it in Firefox using `about:addons` → gear → **Install Add-on From File**. Keep the signed file unchanged; renaming the file is fine.
-4. Name the signed file `ipage-quick-links-1.0.6.xpi`. In GitHub **Releases → Draft a new release**, create `v1.0.6` from the source commit used in step 1, attach the signed XPI, and publish a normal (non-prerelease) release. Use the [changelog](CHANGELOG.md) for release notes.
-5. In GitHub **Actions → Publish signed release → Run workflow**, enter `v1.0.6`. This checks the signed package against the repo source, updates the signed Firefox feed and download page, and deploys GitHub Pages. Do not edit the release source files between steps 1 and 5.
-6. Check the [download page](https://adelechase.github.io/ipage-quick-links/), the [Firefox update feed](https://adelechase.github.io/ipage-quick-links/updates.json), and Firefox **about:addons → gear → Check for Updates**. The fallback v1.0.5 will still be available as a signed older release.
+4. Name the signed file `ipage-quick-links-1.0.7.xpi`. In GitHub **Releases → Draft a new release**, create `v1.0.7` from the source commit used in step 1, attach the signed XPI, and publish a normal (non-prerelease) release. Use the [changelog](CHANGELOG.md) for release notes.
+5. In GitHub **Actions → Publish signed release → Run workflow**, enter `v1.0.7`. This checks the signed package against the repo source, updates the signed Firefox feed and download page, and deploys GitHub Pages. Do not edit the release source files between steps 1 and 5.
+6. Check the [download page](https://adelechase.github.io/ipage-quick-links/), the [Firefox update feed](https://adelechase.github.io/ipage-quick-links/updates.json), and Firefox **about:addons → gear → Check for Updates**. The fallback v1.0.6 will still be available as a signed older release.
 
 ## Later updates
 
