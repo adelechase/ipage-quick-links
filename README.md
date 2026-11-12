@@ -6,8 +6,9 @@ A Firefox add-on that automatically displays Goodreads rating, ratings count, re
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE). Use, modify, and redistribute under its terms. Required Notice: Copyright 2026 Adele Lesli Chase. Include LICENSE and NOTICE with redistributed copies. This is source-available software with noncommercial restrictions.
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may use, modify, and redistribute the code for noncommercial purposes, including use by libraries, educational institutions, public research organizations, charitable organizations, and government institutions. Commercial use requires separate permission from the copyright holder.
 
+SPDX identifier: `PolyForm-Noncommercial-1.0.0`
 ## Publisher setup (one time)
 
 1. For public downloads and remixing, make this repository public in **Settings → General → Danger Zone → Change repository visibility**. Only the extension and distribution files belong here; do not upload account credentials or private catalog exports.
