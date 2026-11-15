@@ -9,6 +9,10 @@ A Firefox add-on that automatically displays Goodreads rating, ratings count, re
 This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may use, modify, and redistribute the code for noncommercial purposes, including use by libraries, educational institutions, public research organizations, charitable organizations, and government institutions. Commercial use requires separate permission from the copyright holder.
 
 SPDX identifier: `PolyForm-Noncommercial-1.0.0`
+## Download-page content and styling
+
+The website text and HTML layout are maintained in `site/download-template.html`, and its CSS is in `docs/styles.css`. The published `docs/index.html` is generated from that template. When a signed release is finalized, `release.py` fills in the current and fallback signed download links without replacing the instructions, styling, or AI disclosure. For website-only edits, update the template and the current published `docs/index.html` together. Do not edit `docs/updates.json` for website-only changes.
+
 ## Publisher setup (one time)
 
 1. For public downloads and remixing, make this repository public in **Settings → General → Danger Zone → Change repository visibility**. Only the extension and distribution files belong here; do not upload account credentials or private catalog exports.
