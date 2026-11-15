@@ -33,10 +33,11 @@
 
     <h2>How Book Information Is Found and Displayed</h2>
     <h3>Goodreads information</h3>
-    <p>The panel displays a Goodreads rating, the number of ratings and reviews, and a want-to-read count when those values can be found. Ratings below 3.0 are marked <strong>NR:</strong>. Unavailable statistics are generally shown with a dash; a missing want-to-read total on a matched book may display as <strong>0wtr</strong>, which does not necessarily mean nobody wants to read the book.</p>
+    <p>The panel displays a Goodreads rating, the number of ratings and reviews, and a want-to-read count when those values can be found. Ratings below 3.0 are marked <strong>NR:</strong>. Unavailable statistics are generally shown with a dash; a missing want-to-read total on a matched book may display as <strong>0wtr</strong>.</p>
 
     <h3>Matching books</h3>
     <p>The extension looks for the right Goodreads record using the book's ISBN and title, with additional title-and-author checks when necessary. These include fallbacks for certain edition labels, subtitles, and trailing parenthetical information. It also looks for a matching NetGalley page. If no reliable match is available, the extension does not invent one.</p>
+    <p>Matching sometimes fails when book titles include subtitles or parenthetical information. If a book with a subtitle or parenthetical shows blank, unusually low, or zero Goodreads counts, double-check the results by searching Goodreads manually using only the main title.</p>
 
     <h3>Source tabs and iPage</h3>
     <p>The extension reuses the Goodreads and NetGalley tabs it opens while checking a book. It does not read or edit the contents of Notes, submit a separate iPage save request, or replace iPage's own validation. You can inspect the source tabs, close them with the extension's control, or let Update close them as you work through your list.</p>
