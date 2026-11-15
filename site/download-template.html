@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Install iPage Quick GR and NG for Firefox and learn how to use its Goodreads and NetGalley book lookups in Ingram iPage.">
+  <title>iPage Quick GR and NG</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content">
+    <h1>iPage Quick GR and NG</h1>
+    <p>This Firefox extension adds Goodreads statistics and direct Goodreads and NetGalley book links above the Notes field on individual Ingram iPage product pages. It puts the information I use when evaluating books in one place, without changing how iPage saves my work.</p>
+
+    <h2>How to Install the iPage Quick GR and NG Extension</h2>
+    <ol>
+      <li>Use Firefox 142 or newer, then select the purple installation link below.</li>
+      <li>If Firefox prompts you to add the extension, review the permissions and follow the prompts. If the <code>.xpi</code> file downloads instead, open <code>about:addons</code> in Firefox, select the gear menu, choose <strong>Install Add-on From File</strong>, and select the downloaded file.</li>
+      <li>Open Ingram iPage and navigate to an individual book's Product Detail page to start using the extension.</li>
+    </ol>
+    <p><a class="install-button" href="{{DOWNLOAD_URL}}">Install version {{VERSION}} for Firefox</a></p>
+    {{FALLBACK_HTML}}
+    <p>Firefox checks for newer signed releases according to its add-on update settings, so you do not need to reinstall the extension after each update.</p>
+
+    <h2>How to Use the Extension</h2>
+    <ol>
+      <li>Open a book from a selection list in Ingram iPage. The extension works on the individual Product Detail page, not the multi-book cart or search results list.</li>
+      <li>Look above <strong>Notes</strong> for the Goodreads information and links to the book's Goodreads and NetGalley pages. The extension opens a background tab for each source and leaves those tabs available if you want to check the matches yourself.</li>
+      <li>Select <strong>Refresh</strong> if you want to run the book lookup again, or <strong>Close GR/NG tabs</strong> to close the source tabs opened by the extension.</li>
+      <li>When you're ready to move on, use iPage's usual <strong>Update</strong> control. The extension closes its source tabs and allows iPage's normal save process to continue. When iPage provides a next-book link, Update takes you to that book after saving.</li>
+    </ol>
+
+    <h2>How Book Information Is Found and Displayed</h2>
+    <h3>Goodreads information</h3>
+    <p>The panel displays a Goodreads rating, the number of ratings and reviews, and a want-to-read count when those values can be found. Ratings below 3.0 are marked <strong>NR:</strong>. Unavailable statistics are generally shown with a dash; a missing want-to-read total on a matched book may display as <strong>0wtr</strong>, which does not necessarily mean nobody wants to read the book.</p>
+
+    <h3>Matching books</h3>
+    <p>The extension looks for the right Goodreads record using the book's ISBN and title, with additional title-and-author checks when necessary. These include fallbacks for certain edition labels, subtitles, and trailing parenthetical information. It also looks for a matching NetGalley page. If no reliable match is available, the extension does not invent one.</p>
+
+    <h3>Source tabs and iPage</h3>
+    <p>The extension reuses the Goodreads and NetGalley tabs it opens while checking a book. It does not read or edit the contents of Notes, submit a separate iPage save request, or replace iPage's own validation. You can inspect the source tabs, close them with the extension's control, or let Update close them as you work through your list.</p>
+
+    <h3>Privacy and permissions</h3>
+    <p>The extension reads the current book's title, author, and ISBN for its lookups and caches retrieved results in Firefox's local extension storage. It does not send information to an AI service or include analytics or advertising code. See the <a href="privacy.html">privacy information</a> for details about website requests, optional private-window behavior, and extension permissions.</p>
+
+    <h3>AI Disclosure</h3>
+    <p>I developed this extension and its instructions by working back and forth with ChatGPT (OpenAI), testing the results and making changes along the way. The extension uses JavaScript to look up book information and HTML and CSS to display it in iPage. Although AI helped me build it, the extension itself does not use AI when you run it; it looks up and displays information from Goodreads and NetGalley.</p>
+
+    <details>
+      <summary><strong>Click here to view the readable JavaScript source.</strong></summary>
+      <p>The code is available in the <a href="https://github.com/adelechase/ipage-quick-links/tree/main/extension">GitHub repository</a>. The main files are <a href="https://github.com/adelechase/ipage-quick-links/blob/main/extension/content.js">content.js</a> (the iPage panel), <a href="https://github.com/adelechase/ipage-quick-links/blob/main/extension/background.js">background.js</a> (lookups and source tabs), <a href="https://github.com/adelechase/ipage-quick-links/blob/main/extension/core.js">core.js</a> (matching and formatting), and <a href="https://github.com/adelechase/ipage-quick-links/blob/main/extension/reader.js">reader.js</a> (reading source pages).</p>
+    </details>
+  </main>
+</body>
+</html>
