@@ -18,6 +18,20 @@ FILES = ('manifest.json', 'core.js', 'background.js', 'reader.js', 'content.js',
 def write_json(path, data):
     path.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
 
+def render_download_page(version, download_url, fallback_html):
+    """Render the durable site template with the current signed download links."""
+    template = (ROOT / 'site/download-template.html').read_text(encoding='utf-8')
+    replacements = {
+        '{{DOWNLOAD_URL}}': html.escape(download_url, quote=True),
+        '{{VERSION}}': html.escape(version),
+        '{{FALLBACK_HTML}}': fallback_html,
+    }
+    for marker, value in replacements.items():
+        if template.count(marker) != 1:
+            raise ValueError(f'Expected exactly one {marker} marker in the site template.')
+        template = template.replace(marker, value)
+    return template
+
 def configuration():
     c = json.loads((ROOT / 'release-config.json').read_text(encoding='utf-8'))
     base = c['base_url'].rstrip('/') + '/'
@@ -114,11 +128,7 @@ def finalize(signed_file):
         fallback_url = asset_base.replace('v' + version + '/', 'v' + fallback_version + '/') + f'ipage-quick-links-{fallback_version}.xpi'
         fallback_html = f'<p>Fallback: <a href="{html.escape(fallback_url, quote=True)}">signed version {html.escape(fallback_version)}</a></p>'
     (publish / 'index.html').write_text(
-        '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">'
-        '<title>iPage Quick GR and NG</title><body><h1>iPage Quick GR and NG</h1>'
-        f'<p><a href="{html.escape(asset_base + filename, quote=True)}">Install version {html.escape(version)} for Firefox</a></p>' + fallback_html +
-        '<p>Firefox 142 or newer. If downloaded instead of installed, open about:addons, use the gear menu, '
-        'and choose Install Add-on From File.</p><p><a href="privacy.html">Privacy information</a></p></body></html>\n', encoding='utf-8')
+        render_download_page(version, asset_base + filename, fallback_html), encoding='utf-8')
     print(f'Prepared signed release and update feed in {publish}')
     print('Install this exact XPI in Firefox to verify its signature and behavior.')
     print('Upload the signed XPI as a GitHub release asset before publishing docs/ to Pages.')
