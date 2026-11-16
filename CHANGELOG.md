@@ -1,6 +1,6 @@
 # Release history
 
-## 1.0.7 — prepared for Mozilla signing
+## 1.0.7 — Mozilla signed; GitHub publication pending
 - Add the blue iPage icon for Firefox’s add-on interface.
 
 ## 1.0.6 — signed and published (fallback version)
